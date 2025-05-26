@@ -1,5 +1,6 @@
 import { describe, expect, test, beforeEach } from 'vitest';
 import { render, screen, cleanup } from '@testing-library/react';
+import { BrowserRouter } from 'react-router';
 import userEvent from '@testing-library/user-event';
 
 import { SignUpForm } from './SignUpForm';
@@ -10,7 +11,7 @@ describe('SignUpForm Component', () => {
     });
 
     test('Deve renderizar o formulário de cadastro com os campos corretos', () => {
-        render(<SignUpForm />);
+        render(<SignUpForm />, { wrapper: BrowserRouter });
 
         expect(screen.getByTestId('fullName')).toBeInTheDocument();
         expect(screen.getByTestId('email')).toBeInTheDocument();
@@ -22,7 +23,7 @@ describe('SignUpForm Component', () => {
     });
 
     test('Deve permitir preencher os campos do formulário', async () => {
-        render(<SignUpForm />);
+        render(<SignUpForm />, { wrapper: BrowserRouter });
 
         const nameInput = await screen.findByLabelText('Digite seu nome completo');
         const emailInput = await screen.findByLabelText('Digite seu email');
@@ -44,7 +45,7 @@ describe('SignUpForm Component', () => {
     });
 
     test('Deve exibir mensagem de erro ao tentar cadastrar com senhas diferentes', async () => {
-        render(<SignUpForm />);
+        render(<SignUpForm />, { wrapper: BrowserRouter });
 
         const passwordInput = await screen.findByLabelText('Mínimo 8 caracteres');
         const confirmPasswordInput = await screen.findByLabelText('Insira a mesma senha');
@@ -59,7 +60,7 @@ describe('SignUpForm Component', () => {
     });
 
     test('Deve exibir mensagem de erro ao tentar cadastrar com e-mail inválido', async () => {
-        render(<SignUpForm />);
+        render(<SignUpForm />, { wrapper: BrowserRouter });
 
         const emailInput = await screen.findByLabelText('Digite seu email');
 
