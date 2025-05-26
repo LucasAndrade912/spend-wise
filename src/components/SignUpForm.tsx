@@ -70,6 +70,7 @@ export function SignUpForm() {
                     }}
                     error={!!errors.fullName}
                     helperText={errors.fullName?.message}
+                    data-testid="fullName"
                     {...register('fullName')}
                 />
 
@@ -90,6 +91,7 @@ export function SignUpForm() {
                     }}
                     error={!!errors.email}
                     helperText={errors.email?.message}
+                    data-testid="email"
                     {...register('email', { required: true })}
                 />
 
@@ -110,12 +112,13 @@ export function SignUpForm() {
                     }}
                     error={!!errors.password}
                     helperText={errors.password?.message}
+                    data-testid="password"
                     {...register('password', { required: true })}
                 />
 
                 <FormField
                     id="confirmPassword"
-                    label="Mínimo 8 caracteres"
+                    label="Insira a mesma senha"
                     type="password"
                     variant="filled"
                     sx={{ width: '100%', mt: 4 }}
@@ -130,6 +133,7 @@ export function SignUpForm() {
                     }}
                     error={!!errors.confirmPassword}
                     helperText={errors.confirmPassword?.message}
+                    data-testid="confirmPassword"
                     {...register('confirmPassword', { required: true })}
                 />
 
