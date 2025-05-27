@@ -8,7 +8,7 @@ import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import { SignUp } from './pages/SignUp';
 import { SignIn } from './pages/SignIn';
 import { PrivateRoutes } from './layouts/PrivateRoutes';
-import { Example } from './pages/Example';
+import { ListAccounts } from './pages/ListAccounts';
 
 const darkTheme = createTheme({
     palette: {
@@ -28,7 +28,7 @@ createRoot(document.getElementById('root')!).render(
                         <Route path="sign-up" element={<SignUp />} />
                         <Route path="sign-in" element={<SignIn />} />
                         <Route path="/" element={<PrivateRoutes />}>
-                            <Route path="/" element={<Example />} />
+                            <Route path="my-accounts" element={<ListAccounts />} />
                         </Route>
                     </Routes>
                 </BrowserRouter>

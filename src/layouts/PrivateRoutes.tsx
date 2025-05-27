@@ -1,5 +1,7 @@
 import { Navigate, Outlet } from 'react-router';
 
+import { Layout } from './Layout';
+
 export function PrivateRoutes() {
     const token = localStorage.getItem('token');
 
@@ -7,5 +9,9 @@ export function PrivateRoutes() {
         return <Navigate to="/sign-in" replace />;
     }
 
-    return <Outlet />;
+    return (
+        <Layout>
+            <Outlet />
+        </Layout>
+    );
 }
