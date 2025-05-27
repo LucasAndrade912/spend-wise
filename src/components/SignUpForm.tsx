@@ -1,12 +1,15 @@
-import { Box, Button, InputAdornment, Typography } from '@mui/material';
+import { useState } from 'react';
+import { Alert, Box, Button, InputAdornment, Snackbar, Typography } from '@mui/material';
 import { Link } from 'react-router';
 import { lightBlue } from '@mui/material/colors';
 import { AccountCircle, Drafts, Lock } from '@mui/icons-material';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 
 import { FormField } from './FormField';
+import { api } from '../lib/api';
 
 type Inputs = {
     fullName: string;
@@ -15,7 +18,14 @@ type Inputs = {
     confirmPassword: string;
 };
 
+type Response = {
+    data: { token: string };
+    message: string;
+};
+
 export function SignUpForm() {
+    const [alertOpened, setAlertOpened] = useState(false);
+
     const schema = z
         .object({
             fullName: z.string().min(1, { message: 'Campo obrigatório' }),
@@ -36,7 +46,32 @@ export function SignUpForm() {
         resolver: zodResolver(schema),
     });
 
-    const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data);
+    const handleSignUp = async (data: Inputs) => {
+        try {
+            const response = await api.post<Response>('/auth/sign-up', {
+                name: data.fullName,
+                email: data.email,
+                password: data.password,
+                confirmPassword: data.confirmPassword,
+            });
+
+            localStorage.setItem('token', response.data.data.token);
+        } finally {
+            setAlertOpened(true);
+        }
+    };
+
+    const { mutate, error, isError, isSuccess } = useMutation({
+        mutationFn: handleSignUp,
+    });
+
+    const onSubmit: SubmitHandler<Inputs> = (data) => {
+        mutate(data);
+    };
+
+    const handleClose = () => {
+        setAlertOpened(false);
+    };
 
     return (
         <Box
@@ -45,6 +80,38 @@ export function SignUpForm() {
                 flexDirection: 'column',
                 alignItems: 'center',
             }}>
+            {isError && (
+                <Snackbar
+                    open={alertOpened}
+                    autoHideDuration={6000}
+                    onClose={handleClose}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+                    <Alert
+                        variant="filled"
+                        severity="error"
+                        sx={{ width: '100%', mb: { lg: 3, xl: 7 }, color: 'white' }}
+                        onClose={handleClose}>
+                        {(error as any).response?.data.message}
+                    </Alert>
+                </Snackbar>
+            )}
+
+            {isSuccess && (
+                <Snackbar
+                    open={alertOpened}
+                    autoHideDuration={6000}
+                    onClose={handleClose}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+                    <Alert
+                        variant="filled"
+                        severity="success"
+                        sx={{ width: '100%', mb: { lg: 3, xl: 7 }, color: 'white' }}
+                        onClose={handleClose}>
+                        Cadastro realizado com sucesso!
+                    </Alert>
+                </Snackbar>
+            )}
+
             <Typography variant="h5" component="h2">
                 Bem-vindo ao{' '}
                 <Typography component="span" variant="h5" sx={{ color: lightBlue[700] }}>
