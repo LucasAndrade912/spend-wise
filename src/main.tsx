@@ -7,6 +7,8 @@ import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 
 import { SignUp } from './pages/SignUp';
 import { SignIn } from './pages/SignIn';
+import { PrivateRoutes } from './layouts/PrivateRoutes';
+import { Example } from './pages/Example';
 
 const darkTheme = createTheme({
     palette: {
@@ -25,6 +27,9 @@ createRoot(document.getElementById('root')!).render(
                     <Routes>
                         <Route path="sign-up" element={<SignUp />} />
                         <Route path="sign-in" element={<SignIn />} />
+                        <Route path="/" element={<PrivateRoutes />}>
+                            <Route path="/" element={<Example />} />
+                        </Route>
                     </Routes>
                 </BrowserRouter>
             </ThemeProvider>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Alert, Box, Button, InputAdornment, Snackbar, Typography } from '@mui/material';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { lightBlue } from '@mui/material/colors';
 import { AccountCircle, Drafts, Lock } from '@mui/icons-material';
 import { useForm, type SubmitHandler } from 'react-hook-form';
@@ -25,6 +25,7 @@ type Response = {
 
 export function SignUpForm() {
     const [alertOpened, setAlertOpened] = useState(false);
+    const navigate = useNavigate();
 
     const schema = z
         .object({
@@ -56,7 +57,11 @@ export function SignUpForm() {
             });
 
             localStorage.setItem('token', response.data.data.token);
-        } finally {
+            setAlertOpened(true);
+            setTimeout(() => {
+                navigate('/');
+            }, 1000);
+        } catch {
             setAlertOpened(true);
         }
     };
