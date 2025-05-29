@@ -22,9 +22,13 @@ api.interceptors.response.use(
         return response;
     },
     (error) => {
+        console.error('API Error:', error);
         if (error.response && error.response.status === 401) {
             localStorage.removeItem('token');
-            window.location.href = '/sign-in';
+
+            if (window.location.pathname !== '/sign-in') {
+                window.location.href = '/sign-in';
+            }
         }
         return Promise.reject(error);
     }

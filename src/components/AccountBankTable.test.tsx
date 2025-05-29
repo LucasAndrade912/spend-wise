@@ -1,7 +1,8 @@
 import { describe, expect, test, beforeEach } from 'vitest';
-import { render, screen, cleanup } from '@testing-library/react';
+import { screen, cleanup } from '@testing-library/react';
 
 import { AccountBankTable } from './AccountBankTable';
+import { render } from '../test-utils';
 
 describe('AccountBankTable Component', () => {
     beforeEach(() => {

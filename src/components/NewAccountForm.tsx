@@ -1,54 +1,45 @@
 import { useState } from 'react';
-import { Alert, Box, Button, InputAdornment, Snackbar, Typography } from '@mui/material';
-import { Link, useNavigate } from 'react-router';
+import {
+    Alert,
+    Box,
+    Button,
+    FormControl,
+    InputAdornment,
+    InputLabel,
+    MenuItem,
+    Select,
+    Snackbar,
+} from '@mui/material';
 import { lightBlue } from '@mui/material/colors';
-import { Drafts, Lock } from '@mui/icons-material';
+import { Drafts } from '@mui/icons-material';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 
 import { FormField } from './FormField';
-import { api } from '../lib/api';
 
 type Inputs = {
-    email: string;
-    password: string;
+    name: string;
+    type: 'poupanca' | 'corrente' | 'salario';
 };
 
-type Response = {
-    data: { token: string };
-    message: string;
-};
-
-export function SignInForm() {
+export function NewAccountForm() {
     const [alertOpened, setAlertOpened] = useState(false);
-    const navigate = useNavigate();
 
     const schema = z.object({
-        email: z.string().email({ message: 'Informe um email válido' }),
-        password: z.string().min(8, { message: 'Mínimo 8 caracteres' }),
+        name: z.string().min(1, { message: 'Nome é obrigatório' }),
+        type: z.enum(['poupanca', 'corrente', 'salario'], {
+            message: 'Tipo de conta inválido',
+        }),
     });
 
-    const handleSignIn = async (data: Inputs) => {
-        return await api.post<Response>('/auth/sign-in', {
-            email: data.email,
-            password: data.password,
-        });
+    const handleCreateAccount = async (data: Inputs) => {
+        console.log('Dados do formulário:', data);
     };
 
     const { mutate, error, isError, isSuccess } = useMutation({
-        mutationFn: handleSignIn,
-        onSuccess: ({ data }) => {
-            localStorage.setItem('token', data.data.token);
-            setAlertOpened(true);
-            setTimeout(() => {
-                navigate('/my-accounts');
-            }, 700);
-        },
-        onError: () => {
-            setAlertOpened(true);
-        },
+        mutationFn: handleCreateAccount,
     });
 
     const onSubmit: SubmitHandler<Inputs> = (data) => {
@@ -74,11 +65,7 @@ export function SignInForm() {
                 flexDirection: 'column',
                 alignItems: 'center',
             }}>
-            <Typography variant="h5" component="h2">
-                Bem-vindo novamente
-            </Typography>
-
-            {isError ? (
+            {isError && (
                 <Snackbar
                     open={alertOpened}
                     autoHideDuration={6000}
@@ -92,7 +79,9 @@ export function SignInForm() {
                         {(error as any).response?.data.message}
                     </Alert>
                 </Snackbar>
-            ) : (
+            )}
+
+            {isSuccess && (
                 <Snackbar
                     open={alertOpened}
                     autoHideDuration={6000}
@@ -108,18 +97,21 @@ export function SignInForm() {
                 </Snackbar>
             )}
 
-            {isSuccess ? <div>SUCESSO!</div> : null}
-
             <Box
                 component="form"
-                sx={{ width: '380px', mt: 6 }}
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '32px',
+                    width: '564px',
+                }}
                 onSubmit={handleSubmit(onSubmit)}>
                 <FormField
-                    id="email"
-                    label="Digite seu email"
-                    type="email"
+                    id="name"
+                    label="Nome da conta"
+                    type="text"
                     variant="filled"
-                    sx={{ width: '100%', mt: 4 }}
+                    sx={{ width: '100%' }}
                     slotProps={{
                         input: {
                             endAdornment: (
@@ -129,32 +121,20 @@ export function SignInForm() {
                             ),
                         },
                     }}
-                    error={!!errors.email}
-                    helperText={errors.email?.message}
-                    data-testid="email"
-                    {...register('email', { required: true })}
+                    error={!!errors.name}
+                    helperText={errors.name?.message}
+                    data-testid="name"
+                    {...register('name', { required: true })}
                 />
 
-                <FormField
-                    id="password"
-                    label="Mínimo 8 caracteres"
-                    type="password"
-                    variant="filled"
-                    sx={{ width: '100%', mt: 4 }}
-                    slotProps={{
-                        input: {
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <Lock />
-                                </InputAdornment>
-                            ),
-                        },
-                    }}
-                    error={!!errors.password}
-                    helperText={errors.password?.message}
-                    data-testid="password"
-                    {...register('password', { required: true })}
-                />
+                <FormControl variant="filled">
+                    <InputLabel id="account-type-label">Tipo de conta</InputLabel>
+                    <Select labelId="account-type-label" id="type">
+                        <MenuItem value="poupanca">Poupança</MenuItem>
+                        <MenuItem value="corrente">Corrente</MenuItem>
+                        <MenuItem value="salario">Salário</MenuItem>
+                    </Select>
+                </FormControl>
 
                 <Button
                     type="submit"
@@ -163,22 +143,11 @@ export function SignInForm() {
                     sx={{
                         width: '100%',
                         bgcolor: lightBlue[700],
-                        mt: 7,
+                        mt: { lg: 2, xl: 7 },
                         color: 'white',
                     }}>
-                    Entrar
+                    Cadastrar
                 </Button>
-
-                <Typography variant="body2" sx={{ textAlign: 'center', mt: 5 }}>
-                    Ainda não possui cadastro?{' '}
-                    <Typography
-                        component={Link}
-                        to="/sign-up"
-                        color={lightBlue[700]}
-                        sx={{ textDecoration: 'underline' }}>
-                        Cadastra-se agora
-                    </Typography>
-                </Typography>
             </Box>
         </Box>
     );

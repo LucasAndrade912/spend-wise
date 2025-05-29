@@ -1,8 +1,8 @@
 import { Typography } from '@mui/material';
 
-import { AccountBankTable } from '../components/AccountBankTable';
+import { NewAccountForm } from '../components/NewAccountForm';
 
-export function ListAccounts() {
+export function CreateAccount() {
     return (
         <>
             <Typography
@@ -13,9 +13,9 @@ export function ListAccounts() {
                     marginBottom: '64px',
                     marginTop: { lg: '80px', xl: '180px' },
                 }}>
-                Minhas contas
+                Criar nova conta
             </Typography>
-            <AccountBankTable />
+            <NewAccountForm />
         </>
     );
 }

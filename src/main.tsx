@@ -9,6 +9,7 @@ import { SignUp } from './pages/SignUp';
 import { SignIn } from './pages/SignIn';
 import { PrivateRoutes } from './layouts/PrivateRoutes';
 import { ListAccounts } from './pages/ListAccounts';
+import { CreateAccount } from './pages/CreateAccount';
 
 const darkTheme = createTheme({
     palette: {
@@ -29,6 +30,7 @@ createRoot(document.getElementById('root')!).render(
                         <Route path="sign-in" element={<SignIn />} />
                         <Route path="/" element={<PrivateRoutes />}>
                             <Route path="my-accounts" element={<ListAccounts />} />
+                            <Route path="create-account" element={<CreateAccount />} />
                         </Route>
                     </Routes>
                 </BrowserRouter>
