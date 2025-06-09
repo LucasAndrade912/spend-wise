@@ -11,7 +11,6 @@ export function ListAccounts() {
                 sx={{
                     fontWeight: 'medium',
                     marginBottom: '64px',
-                    marginTop: { lg: '80px', xl: '180px' },
                 }}>
                 Minhas contas
             </Typography>
