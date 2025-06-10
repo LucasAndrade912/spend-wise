@@ -1,5 +1,11 @@
+import { Delete, Edit } from '@mui/icons-material';
 import { Box } from '@mui/material';
-import { DataGrid, type GridColDef, type GridRowsProp } from '@mui/x-data-grid';
+import {
+    DataGrid,
+    GridActionsCellItem,
+    type GridColDef,
+    type GridRowsProp,
+} from '@mui/x-data-grid';
 
 export function AccountBankTable() {
     const rows: GridRowsProp = [
@@ -24,20 +30,41 @@ export function AccountBankTable() {
     ];
 
     const columns: GridColDef[] = [
-        { field: 'id', headerName: 'ID', width: 198 },
-        { field: 'name', headerName: 'Nome', width: 198 },
-        { field: 'type', headerName: 'Tipo', width: 198 },
-        { field: 'created_at', headerName: 'Data de criação', width: 198 },
-        { field: 'actions', headerName: 'Ações', width: 198 },
+        { field: 'id', headerName: 'ID', flex: 1 },
+        { field: 'name', headerName: 'Nome', flex: 1 },
+        { field: 'type', headerName: 'Tipo', flex: 1 },
+        { field: 'created_at', headerName: 'Data de criação', flex: 1 },
+        {
+            field: 'actions',
+            type: 'actions',
+            headerName: 'Ações',
+            flex: 1,
+            align: 'left',
+            headerAlign: 'left',
+            getActions: () => [
+                <GridActionsCellItem
+                    icon={<Delete color="error" />}
+                    label="Deletar conta"
+                />,
+                <GridActionsCellItem
+                    icon={<Edit color="primary" />}
+                    label="Editar conta"
+                />,
+            ],
+        },
     ];
 
     return (
-        <Box sx={{ width: '1000px' }}>
+        <Box>
             <DataGrid
                 rows={rows}
                 columns={columns}
-                pageSizeOptions={[5, 10]}
-                sx={{ background: 'none' }}
+                disableColumnResize
+                sx={{
+                    width: { lg: '700px', xl: '1000px' },
+                    bgcolor: 'transparent',
+                    border: 'none',
+                }}
             />
         </Box>
     );

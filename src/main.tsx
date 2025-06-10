@@ -4,6 +4,8 @@ import { BrowserRouter, Route, Routes } from 'react-router';
 import { CssBaseline } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
+import { grey } from '@mui/material/colors';
+import type {} from '@mui/x-data-grid/themeAugmentation';
 
 import { SignUp } from './pages/SignUp';
 import { SignIn } from './pages/SignIn';
@@ -14,6 +16,9 @@ import { CreateAccount } from './pages/CreateAccount';
 const darkTheme = createTheme({
     palette: {
         mode: 'dark',
+        DataGrid: {
+            headerBg: grey[900],
+        },
     },
 });
 

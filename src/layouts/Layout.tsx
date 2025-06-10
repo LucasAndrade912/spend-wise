@@ -105,13 +105,14 @@ export function Layout({ children }: { children: ReactNode }) {
                 component="section"
                 sx={{
                     display: 'flex',
-                    justifyItems: 'center',
-                    alignItems: 'center',
                     flexDirection: 'column',
                     width: '100%',
                     height: '100vh',
                     padding: '0 9.25rem',
-                    marginTop: '7.5rem',
+                    marginTop: {
+                        lg: '4rem',
+                        xl: '7.5rem',
+                    },
                 }}>
                 {children}
             </Box>
