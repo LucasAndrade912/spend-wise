@@ -3,17 +3,27 @@ import { Box, Typography, Menu, Button, MenuItem } from '@mui/material';
 import { Home, CreditCard, Receipt, AccountCircle } from '@mui/icons-material';
 
 import { NavigationLink } from '../components/NavigationLink';
+import { CreateAccountModal } from '../components/CreateAccountModal';
 
 export function Layout({ children }: { children: ReactNode }) {
+    const [openCreateAccountModal, setOpenCreateAccountModal] = useState(false);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const open = Boolean(anchorEl);
+    const openMenu = Boolean(anchorEl);
 
-    const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+    const handleClickMenu = (event: MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
     };
 
-    const handleClose = () => {
+    const handleCloseMenu = () => {
         setAnchorEl(null);
+    };
+
+    const handleOpenCreateAccountModal = () => {
+        setOpenCreateAccountModal(true);
+    };
+
+    const handleCloseCreateAccountModal = () => {
+        setOpenCreateAccountModal(false);
     };
 
     return (
@@ -60,10 +70,21 @@ export function Layout({ children }: { children: ReactNode }) {
                         </Box>
 
                         <Box component="li">
-                            <NavigationLink to="/create-account">
+                            <Button
+                                onClick={handleOpenCreateAccountModal}
+                                sx={{
+                                    color: 'white',
+                                    textDecoration: 'none',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '.5rem',
+                                    textTransform: 'none',
+                                    ':hover': { bgcolor: 'transparent' },
+                                    padding: 0,
+                                }}>
                                 <CreditCard fontSize="medium" />
                                 <Typography variant="body1">Cadastrar conta</Typography>
-                            </NavigationLink>
+                            </Button>
                         </Box>
 
                         <Box component="li">
@@ -76,10 +97,10 @@ export function Layout({ children }: { children: ReactNode }) {
 
                     <Button
                         id="menu-btn"
-                        aria-controls={open ? 'header-menu' : undefined}
+                        aria-controls={openMenu ? 'header-menu' : undefined}
                         aria-haspopup="true"
-                        aria-expanded={open ? 'true' : undefined}
-                        onClick={handleClick}
+                        aria-expanded={openMenu ? 'true' : undefined}
+                        onClick={handleClickMenu}
                         sx={{
                             display: 'flex',
                             gap: '.5rem',
@@ -94,9 +115,9 @@ export function Layout({ children }: { children: ReactNode }) {
                     <Menu
                         id="account-menu"
                         anchorEl={anchorEl}
-                        open={open}
-                        onClose={handleClose}>
-                        <MenuItem onClick={handleClose}>Sair</MenuItem>
+                        open={openMenu}
+                        onClose={handleCloseMenu}>
+                        <MenuItem onClick={handleCloseMenu}>Sair</MenuItem>
                     </Menu>
                 </Box>
             </Box>
@@ -116,6 +137,11 @@ export function Layout({ children }: { children: ReactNode }) {
                 }}>
                 {children}
             </Box>
+
+            <CreateAccountModal
+                open={openCreateAccountModal}
+                handleClose={handleCloseCreateAccountModal}
+            />
         </Box>
     );
 }

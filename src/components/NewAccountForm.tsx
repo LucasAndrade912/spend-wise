@@ -1,18 +1,15 @@
-import { useState } from 'react';
+import { useState, type Ref } from 'react';
 import {
     Alert,
     Box,
-    Button,
     FormControl,
-    InputAdornment,
+    FormHelperText,
     InputLabel,
     MenuItem,
     Select,
     Snackbar,
 } from '@mui/material';
-import { lightBlue } from '@mui/material/colors';
-import { Drafts } from '@mui/icons-material';
-import { useForm, type SubmitHandler } from 'react-hook-form';
+import { Controller, useForm, type SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
@@ -24,7 +21,11 @@ type Inputs = {
     type: 'poupanca' | 'corrente' | 'salario';
 };
 
-export function NewAccountForm() {
+type Props = {
+    ref: Ref<HTMLFormElement>;
+};
+
+export function NewAccountForm({ ref }: Props) {
     const [alertOpened, setAlertOpened] = useState(false);
 
     const schema = z.object({
@@ -54,6 +55,7 @@ export function NewAccountForm() {
         register,
         handleSubmit,
         formState: { errors },
+        control,
     } = useForm<Inputs>({
         resolver: zodResolver(schema),
     });
@@ -99,11 +101,12 @@ export function NewAccountForm() {
 
             <Box
                 component="form"
+                ref={ref}
                 sx={{
+                    width: '100%',
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '32px',
-                    width: '564px',
                 }}
                 onSubmit={handleSubmit(onSubmit)}>
                 <FormField
@@ -112,42 +115,35 @@ export function NewAccountForm() {
                     type="text"
                     variant="filled"
                     sx={{ width: '100%' }}
-                    slotProps={{
-                        input: {
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <Drafts />
-                                </InputAdornment>
-                            ),
-                        },
-                    }}
                     error={!!errors.name}
                     helperText={errors.name?.message}
                     data-testid="name"
                     {...register('name', { required: true })}
                 />
 
-                <FormControl variant="filled">
-                    <InputLabel id="account-type-label">Tipo de conta</InputLabel>
-                    <Select labelId="account-type-label" id="type">
-                        <MenuItem value="poupanca">Poupança</MenuItem>
-                        <MenuItem value="corrente">Corrente</MenuItem>
-                        <MenuItem value="salario">Salário</MenuItem>
-                    </Select>
-                </FormControl>
+                <Controller
+                    control={control}
+                    name="type"
+                    render={({ field }) => (
+                        <FormControl variant="filled" error={!!errors.type}>
+                            <InputLabel id="account-type-label">Tipo de conta</InputLabel>
 
-                <Button
-                    type="submit"
-                    variant="contained"
-                    size="large"
-                    sx={{
-                        width: '100%',
-                        bgcolor: lightBlue[700],
-                        mt: { lg: 2, xl: 7 },
-                        color: 'white',
-                    }}>
-                    Cadastrar
-                </Button>
+                            <Select
+                                labelId="account-type-label"
+                                id="type"
+                                data-testid="type"
+                                {...field}>
+                                <MenuItem value="poupanca">Poupança</MenuItem>
+                                <MenuItem value="corrente">Corrente</MenuItem>
+                                <MenuItem value="salario">Salário</MenuItem>
+                            </Select>
+
+                            {!!errors.type && (
+                                <FormHelperText>{errors.type?.message}</FormHelperText>
+                            )}
+                        </FormControl>
+                    )}
+                />
             </Box>
         </Box>
     );
