@@ -1,10 +1,22 @@
+import { useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import { CreditCard, Receipt } from '@mui/icons-material';
 import { amber } from '@mui/material/colors';
 
 import { AccountBankTable } from '../components/AccountBankTable';
+import { CreateAccountModal } from '../components/CreateAccountModal';
 
 export function ListAccounts() {
+    const [openCreateAccountModal, setOpenCreateAccountModal] = useState(false);
+
+    const handleOpenCreateAccountModal = () => {
+        setOpenCreateAccountModal(true);
+    };
+
+    const handleCloseCreateAccountModal = () => {
+        setOpenCreateAccountModal(false);
+    };
+
     return (
         <Box
             sx={{
@@ -48,7 +60,8 @@ export function ListAccounts() {
                             lg: 'auto',
                             xl: '400px',
                         },
-                    }}>
+                    }}
+                    onClick={handleOpenCreateAccountModal}>
                     <CreditCard fontSize="large" />
                     <Typography
                         sx={(theme) => ({
@@ -90,6 +103,11 @@ export function ListAccounts() {
                     </Typography>
                 </Button>
             </Box>
+
+            <CreateAccountModal
+                open={openCreateAccountModal}
+                handleClose={handleCloseCreateAccountModal}
+            />
         </Box>
     );
 }
