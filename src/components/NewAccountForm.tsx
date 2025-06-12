@@ -1,13 +1,11 @@
-import { useState, type Ref } from 'react';
+import { type Ref } from 'react';
 import {
-    Alert,
     Box,
     FormControl,
     FormHelperText,
     InputLabel,
     MenuItem,
     Select,
-    Snackbar,
 } from '@mui/material';
 import { Controller, useForm, type SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
@@ -15,6 +13,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 
 import { FormField } from './FormField';
+import { api } from '../lib/api';
+import { useNotification } from '../hooks/useNotification';
 
 type Inputs = {
     name: string;
@@ -23,10 +23,11 @@ type Inputs = {
 
 type Props = {
     ref: Ref<HTMLFormElement>;
+    onCloseModal: () => void;
 };
 
-export function NewAccountForm({ ref }: Props) {
-    const [alertOpened, setAlertOpened] = useState(false);
+export function NewAccountForm({ ref, onCloseModal }: Props) {
+    const { showNotification } = useNotification();
 
     const schema = z.object({
         name: z.string().min(1, { message: 'Nome é obrigatório' }),
@@ -36,19 +37,30 @@ export function NewAccountForm({ ref }: Props) {
     });
 
     const handleCreateAccount = async (data: Inputs) => {
-        console.log('Dados do formulário:', data);
+        return await api.post('/accounts', {
+            name: data.name,
+            type: data.type,
+        });
     };
 
-    const { mutate, error, isError, isSuccess } = useMutation({
+    const { mutate } = useMutation({
         mutationFn: handleCreateAccount,
+        onSuccess: () => {
+            showNotification('success', 'Conta cadastrada com sucesso!');
+            setTimeout(() => {
+                onCloseModal();
+            }, 1000);
+        },
+        onError: (error: any) => {
+            showNotification(
+                'error',
+                error?.response?.data?.message || 'Erro ao cadastrar conta'
+            );
+        },
     });
 
     const onSubmit: SubmitHandler<Inputs> = (data) => {
         mutate(data);
-    };
-
-    const handleClose = () => {
-        setAlertOpened(false);
     };
 
     const {
@@ -67,38 +79,6 @@ export function NewAccountForm({ ref }: Props) {
                 flexDirection: 'column',
                 alignItems: 'center',
             }}>
-            {isError && (
-                <Snackbar
-                    open={alertOpened}
-                    autoHideDuration={6000}
-                    onClose={handleClose}
-                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
-                    <Alert
-                        variant="filled"
-                        severity="error"
-                        sx={{ width: '100%', mb: { lg: 3, xl: 7 }, color: 'white' }}
-                        onClose={handleClose}>
-                        {(error as any).response?.data.message}
-                    </Alert>
-                </Snackbar>
-            )}
-
-            {isSuccess && (
-                <Snackbar
-                    open={alertOpened}
-                    autoHideDuration={6000}
-                    onClose={handleClose}
-                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
-                    <Alert
-                        variant="filled"
-                        severity="success"
-                        sx={{ width: '100%', mb: { lg: 3, xl: 7 }, color: 'white' }}
-                        onClose={handleClose}>
-                        Login realizado com sucesso!
-                    </Alert>
-                </Snackbar>
-            )}
-
             <Box
                 component="form"
                 ref={ref}

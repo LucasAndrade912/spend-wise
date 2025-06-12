@@ -11,6 +11,7 @@ import { SignUp } from './pages/SignUp';
 import { SignIn } from './pages/SignIn';
 import { PrivateRoutes } from './layouts/PrivateRoutes';
 import { ListAccounts } from './pages/ListAccounts';
+import { NotificationProvider } from './context/notificationContext';
 
 const darkTheme = createTheme({
     palette: {
@@ -28,15 +29,17 @@ createRoot(document.getElementById('root')!).render(
         <QueryClientProvider client={queryClient}>
             <CssBaseline />
             <ThemeProvider theme={darkTheme}>
-                <BrowserRouter>
-                    <Routes>
-                        <Route path="sign-up" element={<SignUp />} />
-                        <Route path="sign-in" element={<SignIn />} />
-                        <Route path="/" element={<PrivateRoutes />}>
-                            <Route path="my-accounts" element={<ListAccounts />} />
-                        </Route>
-                    </Routes>
-                </BrowserRouter>
+                <NotificationProvider>
+                    <BrowserRouter>
+                        <Routes>
+                            <Route path="sign-up" element={<SignUp />} />
+                            <Route path="sign-in" element={<SignIn />} />
+                            <Route path="/" element={<PrivateRoutes />}>
+                                <Route path="my-accounts" element={<ListAccounts />} />
+                            </Route>
+                        </Routes>
+                    </BrowserRouter>
+                </NotificationProvider>
             </ThemeProvider>
         </QueryClientProvider>
     </StrictMode>

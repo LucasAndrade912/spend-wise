@@ -53,7 +53,7 @@ export function CreateAccountModal({
                 </DialogTitle>
 
                 <DialogContent sx={{ padding: '1rem 1.5rem' }} dividers>
-                    <NewAccountForm ref={formRef} />
+                    <NewAccountForm ref={formRef} onCloseModal={handleClose} />
                 </DialogContent>
 
                 <DialogActions>
