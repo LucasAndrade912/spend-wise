@@ -6,28 +6,38 @@ import {
     type GridColDef,
     type GridRowsProp,
 } from '@mui/x-data-grid';
+import { useQuery } from '@tanstack/react-query';
+
+import { api } from '../lib/api';
+
+type Response = {
+    message: string;
+    data: {
+        id: number;
+        name: string;
+        type: string;
+        createdAt: string;
+        updatedAt: string;
+    }[];
+};
 
 export function AccountBankTable() {
-    const rows: GridRowsProp = [
-        {
-            id: 1,
-            name: 'Data Grid',
-            type: 'the Community version',
-            created_at: '01/01/2025',
-        },
-        {
-            id: 2,
-            name: 'Data Grid Pro',
-            type: 'the Pro version',
-            created_at: '01/01/2025',
-        },
-        {
-            id: 3,
-            name: 'Data Grid Premium',
-            type: 'the Premium version',
-            created_at: '01/01/2025',
-        },
-    ];
+    const handleListAccounts = async () => {
+        return await api.get<Response>('/accounts');
+    };
+
+    const { data: response } = useQuery({
+        queryKey: ['accounts'],
+        queryFn: handleListAccounts,
+    });
+
+    const rows: GridRowsProp =
+        response?.data.data.map((account) => ({
+            id: account.id,
+            name: account.name,
+            type: account.type[0] + account.type.slice(1).toLowerCase(),
+            created_at: new Date(account.createdAt).toLocaleDateString('pt-BR'),
+        })) || [];
 
     const columns: GridColDef[] = [
         { field: 'id', headerName: 'ID', flex: 1 },

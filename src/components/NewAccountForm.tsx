@@ -10,7 +10,7 @@ import {
 import { Controller, useForm, type SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { FormField } from './FormField';
 import { api } from '../lib/api';
@@ -28,6 +28,7 @@ type Props = {
 
 export function NewAccountForm({ ref, onCloseModal }: Props) {
     const { showNotification } = useNotification();
+    const queryClient = useQueryClient();
 
     const schema = z.object({
         name: z.string().min(1, { message: 'Nome é obrigatório' }),
@@ -47,9 +48,8 @@ export function NewAccountForm({ ref, onCloseModal }: Props) {
         mutationFn: handleCreateAccount,
         onSuccess: () => {
             showNotification('success', 'Conta cadastrada com sucesso!');
-            setTimeout(() => {
-                onCloseModal();
-            }, 1000);
+            queryClient.invalidateQueries({ queryKey: ['accounts'] });
+            onCloseModal();
         },
         onError: (error: any) => {
             showNotification(
