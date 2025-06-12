@@ -4,8 +4,10 @@ import { Home, CreditCard, Receipt, AccountCircle } from '@mui/icons-material';
 
 import { NavigationLink } from '../components/NavigationLink';
 import { CreateAccountModal } from '../components/CreateAccountModal';
+import { useAuth } from '../hooks/useAuth';
 
 export function Layout({ children }: { children: ReactNode }) {
+    const { logout, user } = useAuth();
     const [openCreateAccountModal, setOpenCreateAccountModal] = useState(false);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const openMenu = Boolean(anchorEl);
@@ -24,6 +26,11 @@ export function Layout({ children }: { children: ReactNode }) {
 
     const handleCloseCreateAccountModal = () => {
         setOpenCreateAccountModal(false);
+    };
+
+    const handleLogout = () => {
+        logout();
+        handleCloseMenu();
     };
 
     return (
@@ -109,7 +116,7 @@ export function Layout({ children }: { children: ReactNode }) {
                             textTransform: 'none',
                         }}>
                         <AccountCircle fontSize="large" />
-                        <Typography variant="body1">Lucas Andrade</Typography>
+                        <Typography variant="body1">{user?.name}</Typography>
                     </Button>
 
                     <Menu
@@ -117,7 +124,7 @@ export function Layout({ children }: { children: ReactNode }) {
                         anchorEl={anchorEl}
                         open={openMenu}
                         onClose={handleCloseMenu}>
-                        <MenuItem onClick={handleCloseMenu}>Sair</MenuItem>
+                        <MenuItem onClick={handleLogout}>Sair</MenuItem>
                     </Menu>
                 </Box>
             </Box>
