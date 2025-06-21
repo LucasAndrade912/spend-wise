@@ -9,8 +9,9 @@ import type {} from '@mui/x-data-grid/themeAugmentation';
 
 import { SignUp } from './pages/SignUp';
 import { SignIn } from './pages/SignIn';
-import { PrivateRoutes } from './layouts/PrivateRoutes';
 import { ListAccounts } from './pages/ListAccounts';
+import { ListTransactions } from './pages/ListTransactions';
+import { PrivateRoutes } from './layouts/PrivateRoutes';
 import { NotificationProvider } from './context/notificationContext';
 
 const darkTheme = createTheme({
@@ -36,6 +37,12 @@ createRoot(document.getElementById('root')!).render(
                             <Route path="sign-in" element={<SignIn />} />
                             <Route path="/" element={<PrivateRoutes />}>
                                 <Route path="my-accounts" element={<ListAccounts />} />
+                                <Route path="transactions">
+                                    <Route
+                                        path=":accountId"
+                                        element={<ListTransactions />}
+                                    />
+                                </Route>
                             </Route>
                         </Routes>
                     </BrowserRouter>

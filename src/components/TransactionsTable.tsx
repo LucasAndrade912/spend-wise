@@ -1,45 +1,57 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { Box } from '@mui/material';
 import { Delete, Edit } from '@mui/icons-material';
-import type { GridPaginationModel } from '@mui/x-data-grid';
 import {
+    type GridColDef,
+    type GridPaginationModel,
+    type GridRowsProp,
     DataGrid,
     GridActionsCellItem,
-    type GridColDef,
-    type GridRowsProp,
 } from '@mui/x-data-grid';
-import { useQuery, keepPreviousData } from '@tanstack/react-query';
 
 import { api } from '../lib/api';
+
+type Props = {
+    accountId: string;
+};
 
 type Response = {
     message: string;
     data: {
-        id: number;
-        name: string;
-        type: string;
+        id: string;
+        accountId: string;
+        amount: number;
+        transactionCategoryId: string;
+        description: string;
+        date: string;
         createdAt: string;
         updatedAt: string;
+        category: { name: string };
     }[];
     total: number;
     totalPages: number;
 };
 
-export function AccountBankTable() {
-    const navigate = useNavigate();
-
+export function TransactionsTable({ accountId }: Props) {
     const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
         page: 0,
         pageSize: 5,
     });
 
     const { data: response, isFetching } = useQuery({
-        queryKey: ['accounts', paginationModel.page, paginationModel.pageSize],
+        queryKey: [
+            'transactions',
+            accountId,
+            paginationModel.page,
+            paginationModel.pageSize,
+        ],
         queryFn: async ({ queryKey }) => {
-            const [, page, pageSize] = queryKey;
-            return await api.get<Response>('/accounts', {
+            const [, , page, pageSize] = queryKey;
+
+            return await api.get<Response>('/transactions', {
                 params: {
+                    accountId,
                     page: (page as number) + 1,
                     limit: pageSize,
                 },
@@ -49,9 +61,10 @@ export function AccountBankTable() {
     });
 
     const columns: GridColDef[] = [
-        { field: 'name', headerName: 'Nome', flex: 1 },
-        { field: 'type', headerName: 'Tipo', flex: 1 },
-        { field: 'created_at', headerName: 'Data de criação', flex: 1 },
+        { field: 'value', headerName: 'Valor', flex: 1 },
+        { field: 'category', headerName: 'Categoria', flex: 1 },
+        { field: 'date', headerName: 'Data', flex: 1 },
+        { field: 'description', headerName: 'Descrição', flex: 1 },
         {
             field: 'actions',
             type: 'actions',
@@ -75,16 +88,16 @@ export function AccountBankTable() {
     return (
         <Box>
             <DataGrid
-                onCellClick={({ id }) => navigate(`/transactions/${id}`)}
                 loading={isFetching}
                 rows={
-                    response?.data.data.map((account) => ({
-                        id: account.id,
-                        name: account.name,
-                        type: account.type[0] + account.type.slice(1).toLowerCase(),
-                        created_at: new Date(account.createdAt).toLocaleDateString(
-                            'pt-BR'
-                        ),
+                    response?.data.data.map((transaction) => ({
+                        id: transaction.id,
+                        value: (transaction.amount / 100).toLocaleString('pt-BR', {
+                            style: 'currency',
+                            currency: 'BRL',
+                        }),
+                        category: transaction.category.name,
+                        date: new Date(transaction.date).toLocaleDateString('pt-BR'),
                     })) as GridRowsProp
                 }
                 columns={columns}
