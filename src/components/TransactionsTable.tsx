@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { Box } from '@mui/material';
+import { Box, Chip } from '@mui/material';
 import { Delete, Edit } from '@mui/icons-material';
 import {
     type GridColDef,
@@ -62,7 +62,18 @@ export function TransactionsTable({ accountId }: Props) {
 
     const columns: GridColDef[] = [
         { field: 'value', headerName: 'Valor', flex: 1 },
-        { field: 'category', headerName: 'Categoria', flex: 1 },
+        {
+            field: 'category',
+            headerName: 'Categoria',
+            flex: 1,
+            renderCell: (params) => (
+                <Chip
+                    label={params.value}
+                    size="small"
+                    color={params.value === 'Entrada' ? 'success' : 'error'}
+                />
+            ),
+        },
         { field: 'date', headerName: 'Data', flex: 1 },
         { field: 'description', headerName: 'Descrição', flex: 1 },
         {
