@@ -21,7 +21,7 @@ type Response = {
     data: {
         id: string;
         accountId: string;
-        amount: number;
+        ammount: number;
         transactionCategoryId: string;
         description: string;
         date: string;
@@ -103,12 +103,13 @@ export function TransactionsTable({ accountId }: Props) {
                 rows={
                     response?.data.data.map((transaction) => ({
                         id: transaction.id,
-                        value: (transaction.amount / 100).toLocaleString('pt-BR', {
+                        value: (transaction.ammount / 100).toLocaleString('pt-BR', {
                             style: 'currency',
                             currency: 'BRL',
                         }),
                         category: transaction.category.name,
                         date: new Date(transaction.date).toLocaleDateString('pt-BR'),
+                        description: transaction.description,
                     })) as GridRowsProp
                 }
                 columns={columns}

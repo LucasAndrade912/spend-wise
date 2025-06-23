@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Box, Button, IconButton, Typography } from '@mui/material';
 import { useNavigate, useParams } from 'react-router';
 import { TransactionsTable } from '../components/TransactionsTable';
@@ -7,6 +8,7 @@ import { blue } from '@mui/material/colors';
 
 import { api } from '../lib/api';
 import { AccountDetailsCards } from '../components/AccountDetailsCards';
+import { CreateTransctionModal } from '../components/CreateTransactionModal';
 
 type Response = {
     message: string;
@@ -24,6 +26,7 @@ type Response = {
 };
 
 export function ListTransactions() {
+    const [openCreateTransactionModal, setOpenCreateTransactionModal] = useState(false);
     const navigate = useNavigate();
     const accountId = useParams().accountId as string;
 
@@ -33,6 +36,14 @@ export function ListTransactions() {
             return await api.get<Response>(`/accounts/${accountId}`);
         },
     });
+
+    const handleOpenCreateTransactionModal = () => {
+        setOpenCreateTransactionModal(true);
+    };
+
+    const handleCloseCreateTransactionModal = () => {
+        setOpenCreateTransactionModal(false);
+    };
 
     return (
         <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
@@ -61,7 +72,8 @@ export function ListTransactions() {
 
                     <Button
                         variant="outlined"
-                        sx={{ borderColor: blue[700], color: blue[700] }}>
+                        sx={{ borderColor: blue[700], color: blue[700] }}
+                        onClick={handleOpenCreateTransactionModal}>
                         <Add />
                         <Typography variant="button">Criar nova transação</Typography>
                     </Button>
@@ -76,6 +88,12 @@ export function ListTransactions() {
                     incomes={response?.data.data.incomes as number}
                 />
             )}
+
+            <CreateTransctionModal
+                open={openCreateTransactionModal}
+                accountId={accountId}
+                handleClose={handleCloseCreateTransactionModal}
+            />
         </Box>
     );
 }
