@@ -14,6 +14,7 @@ import { api } from '../lib/api';
 
 type Props = {
     accountId: string;
+    onClickEdit: (transactionId: string) => void;
 };
 
 type Response = {
@@ -33,7 +34,7 @@ type Response = {
     totalPages: number;
 };
 
-export function TransactionsTable({ accountId }: Props) {
+export function TransactionsTable({ accountId, onClickEdit }: Props) {
     const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
         page: 0,
         pageSize: 5,
@@ -83,7 +84,7 @@ export function TransactionsTable({ accountId }: Props) {
             flex: 1,
             align: 'left',
             headerAlign: 'left',
-            getActions: () => [
+            getActions: (params) => [
                 <GridActionsCellItem
                     icon={<Delete color="error" />}
                     label="Deletar conta"
@@ -91,6 +92,10 @@ export function TransactionsTable({ accountId }: Props) {
                 <GridActionsCellItem
                     icon={<Edit color="primary" />}
                     label="Editar conta"
+                    onClick={() => {
+                        const transactionId = params.id;
+                        onClickEdit(transactionId as string);
+                    }}
                 />,
             ],
         },

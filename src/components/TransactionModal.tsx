@@ -9,15 +9,29 @@ import {
     Paper,
 } from '@mui/material';
 
-import { NewTransactionForm } from './NewTransactionForm';
+import { TransactionForm } from './TransactionForm';
 
 type Props = {
     open: boolean;
     handleClose: () => void;
     accountId: string;
+    transaction?: {
+        id: string;
+        ammount: string;
+        category: string;
+        description?: string;
+        date: string;
+    };
+    isEditMode?: boolean;
 };
 
-export function CreateTransctionModal({ open, handleClose, accountId }: Props) {
+export function TransctionModal({
+    open,
+    handleClose,
+    accountId,
+    isEditMode = false,
+    transaction,
+}: Props) {
     const formRef = useRef<HTMLFormElement>(null);
 
     const handleClickFormSubmit = () => {
@@ -49,13 +63,15 @@ export function CreateTransctionModal({ open, handleClose, accountId }: Props) {
                     id="modal-create-account-title"
                     variant="h4"
                     sx={{ padding: '1rem 1.5rem' }}>
-                    Criar transação
+                    {isEditMode ? 'Editar transação' : 'Criar transação'}
                 </DialogTitle>
 
                 <DialogContent sx={{ padding: '1rem 1.5rem' }} dividers>
-                    <NewTransactionForm
+                    <TransactionForm
                         ref={formRef}
                         accountId={accountId}
+                        defaultValues={transaction}
+                        isEditMode={isEditMode}
                         onCloseModal={handleClose}
                     />
                 </DialogContent>
@@ -63,7 +79,7 @@ export function CreateTransctionModal({ open, handleClose, accountId }: Props) {
                 <DialogActions>
                     <Button variant="contained" onClick={handleClickFormSubmit}>
                         <Check />
-                        Cadastrar
+                        {isEditMode ? 'Editar' : 'Cadastrar'}
                     </Button>
 
                     <Button variant="contained" color="error" onClick={handleClose}>

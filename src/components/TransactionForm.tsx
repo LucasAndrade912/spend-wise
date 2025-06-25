@@ -29,10 +29,24 @@ type Inputs = {
 type Props = {
     accountId: string;
     ref: Ref<HTMLFormElement>;
+    defaultValues?: {
+        id: string;
+        ammount: string;
+        category: string;
+        description?: string;
+        date: string;
+    };
+    isEditMode?: boolean;
     onCloseModal: () => void;
 };
 
-export function NewTransactionForm({ accountId, ref, onCloseModal }: Props) {
+export function TransactionForm({
+    accountId,
+    ref,
+    defaultValues,
+    isEditMode = false,
+    onCloseModal,
+}: Props) {
     const { showNotification } = useNotification();
     const queryClient = useQueryClient();
 
@@ -58,12 +72,27 @@ export function NewTransactionForm({ accountId, ref, onCloseModal }: Props) {
 
     const { mutate } = useMutation({
         mutationFn: async (data: Inputs) => {
-            return await api.post('/transactions', {
+            console.log('Submitting data:', data);
+            const body = {
                 accountId,
-                ammount: Number(data.ammount.split('R$ ')[1].replace(',', '.')) * 100,
                 type: data.category[0].toUpperCase() + data.category.slice(1),
                 date: data.transactionDate,
                 description: data.description,
+            };
+
+            if (isEditMode) {
+                return await api.put(`/transactions/${defaultValues?.id}`, {
+                    ...body,
+                    ammount: Number(data.ammount) * 100,
+                });
+            }
+
+            return await api.post('/transactions', {
+                ...body,
+                ammount:
+                    Number(
+                        data.ammount.split('R$ ')[1].replace('.', '').replace(',', '.')
+                    ) * 100,
             });
         },
         onSuccess: ({ data }) => {
@@ -73,10 +102,8 @@ export function NewTransactionForm({ accountId, ref, onCloseModal }: Props) {
             onCloseModal();
         },
         onError: (error: any) => {
-            showNotification(
-                'error',
-                error?.response?.data?.message || 'Erro ao cadastrar transação'
-            );
+            console.error(error);
+            showNotification('error', error?.response?.data?.message);
         },
     });
 
@@ -91,6 +118,12 @@ export function NewTransactionForm({ accountId, ref, onCloseModal }: Props) {
         control,
     } = useForm<Inputs>({
         resolver: zodResolver(schema),
+        defaultValues: {
+            ammount: defaultValues?.ammount,
+            category: defaultValues?.category as 'entrada' | 'saída',
+            transactionDate: defaultValues?.date,
+            description: defaultValues?.description,
+        },
     });
 
     return (
@@ -100,7 +133,6 @@ export function NewTransactionForm({ accountId, ref, onCloseModal }: Props) {
                 flexDirection: 'column',
                 alignItems: 'center',
             }}>
-            {errors.transactionDate?.message}
             <Box
                 component="form"
                 ref={ref}

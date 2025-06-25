@@ -1,16 +1,16 @@
 import { useState } from 'react';
-import { Box, Button, IconButton, Typography } from '@mui/material';
-import { useNavigate, useParams } from 'react-router';
-import { TransactionsTable } from '../components/TransactionsTable';
-import { Add, ArrowBack } from '@mui/icons-material';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate, useParams } from 'react-router';
 import { blue } from '@mui/material/colors';
+import { Add, ArrowBack } from '@mui/icons-material';
+import { Box, Button, IconButton, Typography } from '@mui/material';
 
 import { api } from '../lib/api';
+import { TransctionModal } from '../components/TransactionModal';
+import { TransactionsTable } from '../components/TransactionsTable';
 import { AccountDetailsCards } from '../components/AccountDetailsCards';
-import { CreateTransctionModal } from '../components/CreateTransactionModal';
 
-type Response = {
+type RetriverAccountResponse = {
     message: string;
     data: {
         id: string;
@@ -25,24 +25,70 @@ type Response = {
     };
 };
 
+type RetriverTransactionResponse = {
+    message: string;
+    data: {
+        id: string;
+        accountId: string;
+        ammount: number;
+        transactionCategoryId: string;
+        description?: string;
+        date: string;
+        createdAt: string;
+        updatedAt: string;
+        account: {
+            id: string;
+            userId: string;
+            name: string;
+            type: string;
+            createdAt: string;
+            updatedAt: string;
+        };
+        category: {
+            id: string;
+            name: 'entrada' | 'saída';
+        };
+    };
+};
+
 export function ListTransactions() {
-    const [openCreateTransactionModal, setOpenCreateTransactionModal] = useState(false);
+    const [openTransactionModal, setOpenTransactionModal] = useState(false);
+    const [editTransactionId, setEditTransactionId] = useState<string | null>(null);
     const navigate = useNavigate();
     const accountId = useParams().accountId as string;
 
-    const { data: response, isSuccess } = useQuery({
+    const { data: retriverAccountResponse, isSuccess } = useQuery({
         queryKey: ['account', accountId],
         queryFn: async () => {
-            return await api.get<Response>(`/accounts/${accountId}`);
+            return await api.get<RetriverAccountResponse>(`/accounts/${accountId}`);
         },
     });
 
-    const handleOpenCreateTransactionModal = () => {
-        setOpenCreateTransactionModal(true);
+    const { data: retriverTransactionResponse } = useQuery({
+        queryKey: ['editTransaction'],
+        queryFn: async () => {
+            const response = await api.get<RetriverTransactionResponse>(
+                `/transactions/${editTransactionId}`
+            );
+
+            handleOpenTransactionModal();
+
+            return response;
+        },
+        enabled: !!editTransactionId,
+    });
+
+    const handleOpenTransactionModal = () => {
+        setOpenTransactionModal(true);
     };
 
-    const handleCloseCreateTransactionModal = () => {
-        setOpenCreateTransactionModal(false);
+    const handleCloseTransactionModal = () => {
+        setOpenTransactionModal(false);
+        setEditTransactionId(null);
+    };
+
+    const handleEditTransaction = (transactionId: string) => {
+        setEditTransactionId(transactionId);
     };
 
     return (
@@ -66,33 +112,50 @@ export function ListTransactions() {
                             <ArrowBack />
                         </IconButton>
                         <Typography variant="h4">
-                            Conta: {response?.data.data.name}
+                            Conta: {retriverAccountResponse?.data.data.name}
                         </Typography>
                     </Box>
 
                     <Button
                         variant="outlined"
                         sx={{ borderColor: blue[700], color: blue[700] }}
-                        onClick={handleOpenCreateTransactionModal}>
+                        onClick={handleOpenTransactionModal}>
                         <Add />
                         <Typography variant="button">Criar nova transação</Typography>
                     </Button>
                 </Box>
-                <TransactionsTable accountId={accountId} />
+                <TransactionsTable
+                    accountId={accountId}
+                    onClickEdit={handleEditTransaction}
+                />
             </Box>
 
             {isSuccess && (
                 <AccountDetailsCards
-                    balance={response?.data.data.balance as number}
-                    expenses={response?.data.data.expenses as number}
-                    incomes={response?.data.data.incomes as number}
+                    balance={retriverAccountResponse?.data.data.balance as number}
+                    expenses={retriverAccountResponse?.data.data.expenses as number}
+                    incomes={retriverAccountResponse?.data.data.incomes as number}
                 />
             )}
 
-            <CreateTransctionModal
-                open={openCreateTransactionModal}
+            <TransctionModal
+                open={openTransactionModal}
                 accountId={accountId}
-                handleClose={handleCloseCreateTransactionModal}
+                handleClose={handleCloseTransactionModal}
+                isEditMode={!!editTransactionId}
+                transaction={
+                    retriverTransactionResponse && !!editTransactionId
+                        ? {
+                              id: retriverTransactionResponse.data.data.id,
+                              ammount: `${retriverTransactionResponse.data.data.ammount / 100}`,
+                              category:
+                                  retriverTransactionResponse.data.data.category.name.toLocaleLowerCase(),
+                              description:
+                                  retriverTransactionResponse.data.data.description,
+                              date: retriverTransactionResponse.data.data.date,
+                          }
+                        : undefined
+                }
             />
         </Box>
     );
