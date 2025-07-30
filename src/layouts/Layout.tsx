@@ -52,7 +52,10 @@ export function Layout({ children }: { children: ReactNode }) {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        padding: '2.5rem 9.25rem',
+                        padding: {
+                            lg: '2.5rem 5rem',
+                            xl: '2.5rem 9.25rem',
+                        },
                     }}>
                     <Typography
                         variant="h5"
@@ -136,7 +139,10 @@ export function Layout({ children }: { children: ReactNode }) {
                     flexDirection: 'column',
                     width: '100%',
                     height: '100vh',
-                    padding: '0 9.25rem',
+                    padding: {
+                        lg: '0 5rem',
+                        xl: '0 9.25rem',
+                    },
                     marginTop: {
                         lg: '4rem',
                         xl: '7.5rem',

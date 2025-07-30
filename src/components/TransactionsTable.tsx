@@ -1,5 +1,10 @@
 import { useState } from 'react';
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import {
+    keepPreviousData,
+    useMutation,
+    useQuery,
+    useQueryClient,
+} from '@tanstack/react-query';
 import { Box, Chip } from '@mui/material';
 import { Delete, Edit } from '@mui/icons-material';
 import {
@@ -11,6 +16,7 @@ import {
 } from '@mui/x-data-grid';
 
 import { api } from '../lib/api';
+import { useNotification } from '../hooks/useNotification';
 
 type Props = {
     accountId: string;
@@ -35,6 +41,9 @@ type Response = {
 };
 
 export function TransactionsTable({ accountId, onClickEdit }: Props) {
+    const { showNotification } = useNotification();
+    const queryClient = useQueryClient();
+
     const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
         page: 0,
         pageSize: 5,
@@ -59,6 +68,21 @@ export function TransactionsTable({ accountId, onClickEdit }: Props) {
             });
         },
         placeholderData: keepPreviousData,
+    });
+
+    const deleteTransactionMutation = useMutation({
+        mutationFn: async (transactionId: string) => {
+            await api.delete(`/transactions/${transactionId}`);
+        },
+        onSuccess: () => {
+            showNotification('success', 'Conta removida com sucesso!');
+            setPaginationModel({
+                page: 0,
+                pageSize: 5,
+            });
+            queryClient.invalidateQueries({ queryKey: ['transactions'] });
+            queryClient.invalidateQueries({ queryKey: ['account'] });
+        },
     });
 
     const columns: GridColDef[] = [
@@ -88,6 +112,10 @@ export function TransactionsTable({ accountId, onClickEdit }: Props) {
                 <GridActionsCellItem
                     icon={<Delete color="error" />}
                     label="Deletar conta"
+                    onClick={() => {
+                        const transactionId = params.id;
+                        deleteTransactionMutation.mutate(transactionId as string);
+                    }}
                 />,
                 <GridActionsCellItem
                     icon={<Edit color="primary" />}

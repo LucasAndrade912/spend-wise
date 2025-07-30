@@ -70,7 +70,7 @@ export function ListAccounts() {
                                 xl: theme.typography.h5.fontSize,
                             },
                         })}>
-                        Cadastro conta
+                        Cadastrar conta
                     </Typography>
                 </Button>
 

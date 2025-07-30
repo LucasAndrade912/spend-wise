@@ -72,7 +72,6 @@ export function TransactionForm({
 
     const { mutate } = useMutation({
         mutationFn: async (data: Inputs) => {
-            console.log('Submitting data:', data);
             const body = {
                 accountId,
                 type: data.category[0].toUpperCase() + data.category.slice(1),
@@ -97,6 +96,7 @@ export function TransactionForm({
         },
         onSuccess: ({ data }) => {
             showNotification('success', data.message);
+            queryClient.invalidateQueries({ queryKey: ['account'] });
             queryClient.invalidateQueries({ queryKey: ['accounts'] });
             queryClient.invalidateQueries({ queryKey: ['transactions'] });
             onCloseModal();

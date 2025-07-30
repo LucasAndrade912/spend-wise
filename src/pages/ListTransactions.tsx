@@ -111,7 +111,14 @@ export function ListTransactions() {
                         <IconButton onClick={() => navigate(-1)}>
                             <ArrowBack />
                         </IconButton>
-                        <Typography variant="h4">
+                        <Typography
+                            variant="h4"
+                            sx={(theme) => ({
+                                fontSize: {
+                                    lg: theme.typography.h5.fontSize,
+                                    xl: theme.typography.h4.fontSize,
+                                },
+                            })}>
                             Conta: {retriverAccountResponse?.data.data.name}
                         </Typography>
                     </Box>
